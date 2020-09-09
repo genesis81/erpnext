@@ -29,11 +29,15 @@ def get_funnel_data(from_date, to_date, company):
 
 	opportunities = frappe.db.sql("""select count(*) from `tabOpportunity`
 		where (date(`creation`) between %s and %s)
-		and status != "Lost" and company=%s""", (from_date, to_date, company))[0][0]
+		and status != "Lost" and status != "Quotation" and company=%s""", (from_date, to_date, company))[0][0]
 
 	quotations = frappe.db.sql("""select count(*) from `tabQuotation`
 		where docstatus = 1 and (date(`creation`) between %s and %s)
 		and status != "Lost" and company=%s""", (from_date, to_date, company))[0][0]
+
+	quotations +=  frappe.db.sql("""select count(*) from `tabOpportunity`
+                where (date(`creation`) between %s and %s)
+                and status = "Quotation" and company=%s""", (from_date, to_date, company))[0][0]
 
 	sales_orders = frappe.db.sql("""select count(*) from `tabSales Order`
 		where docstatus = 1 and (date(`creation`) between %s and %s) and company=%s""", (from_date, to_date, company))[0][0]
